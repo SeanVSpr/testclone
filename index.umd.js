@@ -1,6 +1,6 @@
 /**
  * angular2-multiselect-dropdown - Angular 2 and angular 4 multiselect dropdown component.
- * @version v2.5.0
+ * @version v2.6.0
  * @author undefined
  * @link undefined
  * @license MIT
@@ -219,7 +219,6 @@ var AngularMultiSelect = /** @class */ (function () {
         this.onClose = new core_1.EventEmitter();
         this.isActive = false;
         this.isSelectAll = false;
-        this.filter = new multiselect_model_1.ListItem();
         this.chunkIndex = [];
         this.cachedItems = [];
         this.itemHeight = 41.6;
@@ -238,7 +237,8 @@ var AngularMultiSelect = /** @class */ (function () {
             showCheckbox: true,
             noDataLabel: 'No Data Available',
             searchAutofocus: true,
-            lazyLoading: false
+            lazyLoading: false,
+            labelKey: 'itemName'
         };
         this.onTouchedCallback = noop;
         this.onChangeCallback = noop;
@@ -407,7 +407,15 @@ var AngularMultiSelect = /** @class */ (function () {
         evt.preventDefault();
     };
     AngularMultiSelect.prototype.closeDropdown = function () {
-        this.filter = new multiselect_model_1.ListItem();
+        if (this.searchInput) {
+            this.searchInput.nativeElement.value = "";
+            this.data = [];
+            this.data = this.cachedItems;
+            this.totalHeight = this.itemHeight * this.data.length;
+            this.totalRows = this.data.length;
+            this.updateView(this.scrollTop);
+        }
+        this.filter = "";
         this.isActive = false;
         this.onClose.emit(false);
     };
@@ -475,6 +483,7 @@ var AngularMultiSelect = /** @class */ (function () {
                 for (var prop in el) {
                     if (el[prop].toString().toLowerCase().indexOf(evt.target.value.toString().toLowerCase()) >= 0) {
                         filteredElems.push(el);
+                        break;
                     }
                 }
             });
@@ -602,6 +611,7 @@ var ClickOutsideDirective = /** @class */ (function () {
     ], ClickOutsideDirective.prototype, "clickOutside", void 0);
     __decorate([
         core_1.HostListener('document:click', ['$event', '$event.target']),
+        core_1.HostListener('document:touchstart', ['$event', '$event.target']),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [MouseEvent, HTMLElement]),
         __metadata("design:returntype", void 0)
@@ -694,8 +704,8 @@ var ListFilterPipe = /** @class */ (function () {
     ListFilterPipe.prototype.applyFilter = function (item, filter) {
         var found = false;
         for (var prop in item) {
-            if (filter.itemName) {
-                if (item[prop].toString().toLowerCase().indexOf(filter.itemName.toLowerCase()) >= 0) {
+            if (filter) {
+                if (item[prop].toString().toLowerCase().indexOf(filter.toLowerCase()) >= 0) {
                     found = true;
                 }
             }
@@ -838,7 +848,7 @@ function toComment(sourceMap) {
 /* 8 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"cuppa-dropdown\" (clickOutside)=\"closeDropdown()\">\r\n    <div class=\"selected-list\">\r\n        <div class=\"c-btn\" (click)=\"toggleDropdown($event)\" [ngClass]=\"{'disabled': settings.disabled}\">\r\n            <span *ngIf=\"selectedItems?.length == 0\">{{settings.text}}</span>\r\n            <span *ngIf=\"settings.singleSelection\">\r\n                <span *ngFor=\"let item of selectedItems;trackBy: trackByFn;\">\r\n                    {{item.itemName}}\r\n                </span>\r\n            </span>\r\n            <div class=\"c-list\" *ngIf=\"selectedItems?.length > 0 && !settings.singleSelection\">\r\n                <div class=\"c-token\" *ngFor=\"let item of selectedItems;trackBy: trackByFn;let k = index\" [hidden]=\"k > settings.badgeShowLimit-1\">\r\n                    <span *ngIf=\"!badgeTempl\" class=\"c-label\">{{item.itemName}}</span>\r\n                    <span *ngIf=\"badgeTempl\" class=\"c-label\">\r\n                        <c-templateRenderer [data]=\"badgeTempl\" [item]=\"item\"></c-templateRenderer>\r\n                    </span>\r\n                    <span class=\"fa fa-remove\" (click)=\"onItemClick(item,k,$event)\"></span>\r\n                </div>\r\n            </div> \r\n            <span class=\"countplaceholder\" *ngIf=\"selectedItems?.length > settings.badgeShowLimit\">+{{selectedItems?.length - settings.badgeShowLimit }}</span>\r\n            <span class=\"fa\" [ngClass]=\"{'fa-angle-down': !isActive,'fa-angle-up':isActive}\"></span>\r\n        </div>      \r\n    </div>\r\n    <div class=\"dropdown-list\" [hidden]=\"!isActive\">\r\n    <div class=\"arrow-up arrow-2\"></div>\r\n    <div class=\"arrow-up\"></div>\r\n    <div class=\"list-area\">\r\n        <div class=\"pure-checkbox select-all\" *ngIf=\"settings.enableCheckAll && !settings.singleSelection && !settings.limitSelection\" (click)=\"toggleSelectAll()\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelectAll\" [disabled]=\"settings.limitSelection == selectedItems?.length\"/>\r\n            <label>\r\n                <span [hidden]=\"isSelectAll\">{{settings.selectAllText}}</span>\r\n                <span [hidden]=\"!isSelectAll\">{{settings.unSelectAllText}}</span>\r\n            </label>\r\n        </div>   \r\n        <div class=\"list-filter\" *ngIf=\"settings.enableSearchFilter && !settings.lazyLoading\">\r\n            <span class=\"fa fa-search\"></span>\r\n            <input #searchInput type=\"text\" [placeholder]=\"settings.searchPlaceholderText\" [(ngModel)]=\"filter.itemName\">\r\n        </div> \r\n        <div class=\"list-filter\" *ngIf=\"settings.enableSearchFilter && settings.lazyLoading\">\r\n            <span class=\"fa fa-search\"></span>\r\n            <input #searchInput type=\"text\" [placeholder]=\"settings.searchPlaceholderText\" (keyup)=\"filterInfiniteList($event)\">\r\n        </div>\r\n    <ul *ngIf=\"!settings.groupBy\" [style.maxHeight] = \"settings.maxHeight+'px'\" class=\"lazyContainer\" >\r\n        <span *ngIf=\"itemTempl\">\r\n            <li *ngFor=\"let item of data | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" class=\"pure-checkbox\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label></label>\r\n            <c-templateRenderer [data]=\"itemTempl\" [item]=\"item\"></c-templateRenderer>\r\n        </li>\r\n        </span>\r\n        <span *ngIf=\"!itemTempl && !settings.lazyLoading\" >\r\n        <li *ngFor=\"let item of data | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" class=\"pure-checkbox\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label>{{item.itemName}}</label>\r\n        </li>\r\n        </span>\r\n        <span *ngIf=\"!itemTempl && settings.lazyLoading\" >\r\n            <div [ngStyle]=\"{'height':totalHeight+'px'}\" style=\"position: relative;\">\r\n\r\n            \r\n        <li *ngFor=\"let item of chunkArray | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" style=\"position: absolute;width: 100%;\" class=\"pure-checkbox\" [styleProp]=\"chunkIndex[i]\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label>{{item.itemName}}</label>\r\n        </li>\r\n        </div>\r\n        </span>\r\n    </ul>\r\n    <div *ngIf=\"settings.groupBy\" [style.maxHeight] = \"settings.maxHeight+'px'\" style=\"overflow: auto;\">\r\n    <ul *ngFor=\"let obj of groupedData ; let i = index;\" class=\"list-grp\">\r\n        <h4 *ngIf=\"(obj.value | listFilter:filter ).length > 0\">{{obj.key}}</h4>\r\n        <span *ngIf=\"itemTempl\" >\r\n        <li *ngFor=\"let item of obj.value | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" class=\"pure-checkbox\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label></label>\r\n            <c-templateRenderer [data]=\"itemTempl\" [item]=\"item\"></c-templateRenderer>\r\n        </li>\r\n        </span>\r\n        <span *ngIf=\"!itemTempl\" >\r\n        <li *ngFor=\"let item of obj.value | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" class=\"pure-checkbox\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label>{{item.itemName}}</label>\r\n        </li>\r\n        </span>\r\n    </ul>\r\n    </div>\r\n    <h5 class=\"list-message\" *ngIf=\"data?.length == 0\">{{settings.noDataLabel}}</h5>\r\n    </div>\r\n    </div>\r\n</div>"
+module.exports = "<div class=\"cuppa-dropdown\" (clickOutside)=\"closeDropdown()\">\r\n    <div class=\"selected-list\">\r\n        <div class=\"c-btn\" (click)=\"toggleDropdown($event)\" [ngClass]=\"{'disabled': settings.disabled}\">\r\n            <span *ngIf=\"selectedItems?.length == 0\">{{settings.text}}</span>\r\n            <span *ngIf=\"settings.singleSelection\">\r\n                <span *ngFor=\"let item of selectedItems;trackBy: trackByFn;\">\r\n                    {{item[settings.labelKey]}}\r\n                </span>\r\n            </span>\r\n            <div class=\"c-list\" *ngIf=\"selectedItems?.length > 0 && !settings.singleSelection\">\r\n                <div class=\"c-token\" *ngFor=\"let item of selectedItems;trackBy: trackByFn;let k = index\" [hidden]=\"k > settings.badgeShowLimit-1\">\r\n                    <span *ngIf=\"!badgeTempl\" class=\"c-label\">{{item[settings.labelKey]}}</span>\r\n                    <span *ngIf=\"badgeTempl\" class=\"c-label\">\r\n                        <c-templateRenderer [data]=\"badgeTempl\" [item]=\"item\"></c-templateRenderer>\r\n                    </span>\r\n                    <span class=\"fa fa-remove\" (click)=\"onItemClick(item,k,$event)\"></span>\r\n                </div>\r\n            </div> \r\n            <span class=\"countplaceholder\" *ngIf=\"selectedItems?.length > settings.badgeShowLimit\">+{{selectedItems?.length - settings.badgeShowLimit }}</span>\r\n            <span class=\"fa\" [ngClass]=\"{'fa-angle-down': !isActive,'fa-angle-up':isActive}\"></span>\r\n        </div>      \r\n    </div>\r\n    <div class=\"dropdown-list\" [hidden]=\"!isActive\">\r\n    <div class=\"arrow-up arrow-2\"></div>\r\n    <div class=\"arrow-up\"></div>\r\n    <div class=\"list-area\">\r\n        <div class=\"pure-checkbox select-all\" *ngIf=\"settings.enableCheckAll && !settings.singleSelection && !settings.limitSelection\" (click)=\"toggleSelectAll()\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelectAll\" [disabled]=\"settings.limitSelection == selectedItems?.length\"/>\r\n            <label>\r\n                <span [hidden]=\"isSelectAll\">{{settings.selectAllText}}</span>\r\n                <span [hidden]=\"!isSelectAll\">{{settings.unSelectAllText}}</span>\r\n            </label>\r\n        </div>   \r\n        <div class=\"list-filter\" *ngIf=\"settings.enableSearchFilter && !settings.lazyLoading\">\r\n            <span class=\"fa fa-search\"></span>\r\n            <input #searchInput type=\"text\" [placeholder]=\"settings.searchPlaceholderText\" [(ngModel)]=\"filter\">\r\n        </div> \r\n        <div class=\"list-filter\" *ngIf=\"settings.enableSearchFilter && settings.lazyLoading\">\r\n            <span class=\"fa fa-search\"></span>\r\n            <input #searchInput type=\"text\" [placeholder]=\"settings.searchPlaceholderText\" (keyup)=\"filterInfiniteList($event)\">\r\n        </div>\r\n    <ul *ngIf=\"!settings.groupBy\" [style.maxHeight] = \"settings.maxHeight+'px'\" class=\"lazyContainer\" >\r\n        <span *ngIf=\"itemTempl\">\r\n            <li *ngFor=\"let item of data | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" class=\"pure-checkbox\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label></label>\r\n            <c-templateRenderer [data]=\"itemTempl\" [item]=\"item\"></c-templateRenderer>\r\n        </li>\r\n        </span>\r\n        <span *ngIf=\"!itemTempl && !settings.lazyLoading\" >\r\n        <li *ngFor=\"let item of data | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" class=\"pure-checkbox\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label>{{item[settings.labelKey]}}</label>\r\n        </li>\r\n        </span>\r\n        <span *ngIf=\"!itemTempl && settings.lazyLoading\" >\r\n            <div [ngStyle]=\"{'height':totalHeight+'px'}\" style=\"position: relative;\">\r\n\r\n            \r\n        <li *ngFor=\"let item of chunkArray | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" style=\"position: absolute;width: 100%;\" class=\"pure-checkbox\" [styleProp]=\"chunkIndex[i]\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label>{{item[settings.labelKey]}}</label>\r\n        </li>\r\n        </div>\r\n        </span>\r\n    </ul>\r\n    <div *ngIf=\"settings.groupBy\" [style.maxHeight] = \"settings.maxHeight+'px'\" style=\"overflow: auto;\">\r\n    <ul *ngFor=\"let obj of groupedData ; let i = index;\" class=\"list-grp\">\r\n        <h4 *ngIf=\"(obj.value | listFilter:filter ).length > 0\">{{obj.key}}</h4>\r\n        <span *ngIf=\"itemTempl\" >\r\n        <li *ngFor=\"let item of obj.value | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" class=\"pure-checkbox\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label></label>\r\n            <c-templateRenderer [data]=\"itemTempl\" [item]=\"item\"></c-templateRenderer>\r\n        </li>\r\n        </span>\r\n        <span *ngIf=\"!itemTempl\" >\r\n        <li *ngFor=\"let item of obj.value | listFilter:filter; let i = index;\" (click)=\"onItemClick(item,i,$event)\" class=\"pure-checkbox\">\r\n            <input *ngIf=\"settings.showCheckbox\" type=\"checkbox\" [checked]=\"isSelected(item)\" [disabled]=\"settings.limitSelection == selectedItems?.length && !isSelected(item)\"/>\r\n            <label>{{item[settings.labelKey]}}</label>\r\n        </li>\r\n        </span>\r\n    </ul>\r\n    </div>\r\n    <h5 class=\"list-message\" *ngIf=\"data?.length == 0\">{{settings.noDataLabel}}</h5>\r\n    </div>\r\n    </div>\r\n</div>"
 
 /***/ }),
 /* 9 */

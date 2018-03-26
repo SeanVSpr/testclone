@@ -1,31 +1,27 @@
 {
-  "_args": [
-    [
-      "angular2-multiselect-dropdown@2.5.0",
-      "C:\\Users\\sevs\\Repos\\AlertToolPWA"
-    ]
-  ],
-  "_from": "angular2-multiselect-dropdown@2.5.0",
-  "_id": "angular2-multiselect-dropdown@2.5.0",
+  "_from": "angular2-multiselect-dropdown",
+  "_id": "angular2-multiselect-dropdown@2.6.0",
   "_inBundle": false,
-  "_integrity": "sha1-6halE/Z0LN5V312fqumSzThU7dM=",
+  "_integrity": "sha1-ZXo9GhaBKrjESd5w1k0dXkS95aQ=",
   "_location": "/angular2-multiselect-dropdown",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
+    "type": "tag",
     "registry": true,
-    "raw": "angular2-multiselect-dropdown@2.5.0",
+    "raw": "angular2-multiselect-dropdown",
     "name": "angular2-multiselect-dropdown",
     "escapedName": "angular2-multiselect-dropdown",
-    "rawSpec": "2.5.0",
+    "rawSpec": "",
     "saveSpec": null,
-    "fetchSpec": "2.5.0"
+    "fetchSpec": "latest"
   },
   "_requiredBy": [
+    "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/angular2-multiselect-dropdown/-/angular2-multiselect-dropdown-2.5.0.tgz",
-  "_spec": "2.5.0",
+  "_resolved": "https://registry.npmjs.org/angular2-multiselect-dropdown/-/angular2-multiselect-dropdown-2.6.0.tgz",
+  "_shasum": "657a3d1a16812ab8c449de70d64d1d5e44bde5a4",
+  "_spec": "angular2-multiselect-dropdown",
   "_where": "C:\\Users\\sevs\\Repos\\AlertToolPWA",
   "angular-cli": {},
   "author": {
@@ -34,9 +30,11 @@
   "bugs": {
     "url": "https://github.com/CuppaLabs/angular2-multiselect-dropdown/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "font-awesome": "*"
   },
+  "deprecated": false,
   "description": "Angular 2 and angular 4 multiselect dropdown component.",
   "devDependencies": {
     "@angular/animations": "^4.0.0",
@@ -138,5 +136,5 @@
     "test:watch": "karma start --auto-watch --no-single-run",
     "tslint": "tslint"
   },
-  "version": "2.5.0"
+  "version": "2.6.0"
 }

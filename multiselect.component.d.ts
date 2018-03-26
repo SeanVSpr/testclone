@@ -22,7 +22,7 @@ export declare class AngularMultiSelect implements OnInit, ControlValueAccessor,
     isActive: boolean;
     isSelectAll: boolean;
     groupedData: Array<ListItem>;
-    filter: ListItem;
+    filter: any;
     chunkArray: any[];
     scrollTop: any;
     chunkIndex: any[];

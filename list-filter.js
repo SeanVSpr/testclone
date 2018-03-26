@@ -12,8 +12,8 @@ var ListFilterPipe = /** @class */ (function () {
     ListFilterPipe.prototype.applyFilter = function (item, filter) {
         var found = false;
         for (var prop in item) {
-            if (filter.itemName) {
-                if (item[prop].toString().toLowerCase().indexOf(filter.itemName.toLowerCase()) >= 0) {
+            if (filter) {
+                if (item[prop].toString().toLowerCase().indexOf(filter.toLowerCase()) >= 0) {
                     found = true;
                 }
             }
